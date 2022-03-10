@@ -1,0 +1,16 @@
+@import slick.models.ToDo
+@import model.ViewValueHome
+@(results: Seq[ToDo])
+
+@common.Default() {
+  <h1>一覧画面</h1>
+  @for(toDo <- results){
+    <div>@toDo.id</div>
+    <div>@toDo.categoryId</div>
+    <div>@toDo.title</div>
+    <div>@toDo.body</div>
+    <div>@toDo.state</div>
+    <div>@toDo.createdAt</div>
+    <div>@toDo.updatedAt</div>
+  }
+}
