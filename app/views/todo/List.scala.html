@@ -1,16 +1,27 @@
-@import slick.models.ToDo
-@import model.ViewValueHome
-@(results: Seq[ToDo])
+@import lib.persistence.onMySQL.ToDoRepository.EntityEmbeddedId
+@import lib.persistence.onMySQL.ToDoCategoryRepository.EntityEmbeddedId
+@(toDos: Seq[lib.persistence.onMySQL.ToDoRepository.EntityEmbeddedId]
+        ,toDoCategories:Seq[lib.persistence.onMySQL.ToDoCategoryRepository.EntityEmbeddedId])
 
 @common.Default() {
   <h1>一覧画面</h1>
-  @for(toDo <- results){
+  <h3>ToDo</h3>
+  @for(toDo <- toDos){
     <div>@toDo.id</div>
-    <div>@toDo.categoryId</div>
-    <div>@toDo.title</div>
-    <div>@toDo.body</div>
-    <div>@toDo.state</div>
-    <div>@toDo.createdAt</div>
-    <div>@toDo.updatedAt</div>
+    <div>@toDo.v.categoryId</div>
+    <div>@toDo.v.title</div>
+    <div>@toDo.v.body</div>
+    <div>@toDo.v.state</div>
+    <div>@toDo.v.createdAt</div>
+    <div>@toDo.v.updatedAt</div>
+  }
+  <h3>カテゴリー</h3>
+  @for(toDoCategory <- toDoCategories){
+    <div>@toDoCategory.id</div>
+    <div>@toDoCategory.v.name</div>
+    <div>@toDoCategory.v.slug</div>
+    <div>@toDoCategory.v.color</div>
+    <div>@toDoCategory.v.updatedAt</div>
+    <div>@toDoCategory.v.createdAt</div>
   }
 }
