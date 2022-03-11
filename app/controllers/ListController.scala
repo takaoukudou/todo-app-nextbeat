@@ -19,7 +19,25 @@ class ListController @Inject() (
       toDos <- ToDoRepository()(MyDBProfile).all()
       toDoCategories <- ToDoCategoryRepository()(MyDBProfile).all()
     } yield {
-      Ok(views.html.todo.List(toDos, toDoCategories))
+      val toDoInfoList = toDos.map(toDo => {
+        toDoCategories.find(toDoCategory => toDo.id == toDoCategory.id) match {
+          case Some(toDoCategory) =>
+            (
+              toDo.v.id,
+              toDo.v.title,
+              toDo.v.body,
+              toDo.v.state match {
+                case 0 => "TODO(着手前)"
+                case 1 => "進行中"
+                case 2 => "完了"
+                case _ => ""
+              },
+              toDoCategory.v.name,
+              toDoCategory.v.color
+            )
+        }
+      })
+      Ok(views.html.todo.List(toDoInfoList))
     }
   }
 }

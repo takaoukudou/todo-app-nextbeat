@@ -43,3 +43,20 @@ body {
 .info {
   display: none;
 }
+.category{
+  margin: 10px auto;
+  border: dotted #1e366a 1px;/*ドット 色 太さ*/
+  padding: 0.5em 0.5em 0.5em 2em;
+}
+
+.category-front{
+  background-color: #facfcf;
+}
+
+.category-back{
+  background-color: #d0d0ff;
+}
+
+.category-infra{
+  background-color: #ddffdd;
+}

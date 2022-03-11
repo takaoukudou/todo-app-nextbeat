@@ -1,27 +1,13 @@
-@import lib.persistence.onMySQL.ToDoRepository.EntityEmbeddedId
-@import lib.persistence.onMySQL.ToDoCategoryRepository.EntityEmbeddedId
-@(toDos: Seq[lib.persistence.onMySQL.ToDoRepository.EntityEmbeddedId]
-        ,toDoCategories:Seq[lib.persistence.onMySQL.ToDoCategoryRepository.EntityEmbeddedId])
+@(toDoInfoList:Seq[(Option[Long],String,Option[String],String,String,Short)])
 
 @common.Default() {
-  <h1>一覧画面</h1>
-  <h3>ToDo</h3>
-  @for(toDo <- toDos){
-    <div>@toDo.id</div>
-    <div>@toDo.v.categoryId</div>
-    <div>@toDo.v.title</div>
-    <div>@toDo.v.body</div>
-    <div>@toDo.v.state</div>
-    <div>@toDo.v.createdAt</div>
-    <div>@toDo.v.updatedAt</div>
-  }
-  <h3>カテゴリー</h3>
-  @for(toDoCategory <- toDoCategories){
-    <div>@toDoCategory.id</div>
-    <div>@toDoCategory.v.name</div>
-    <div>@toDoCategory.v.slug</div>
-    <div>@toDoCategory.v.color</div>
-    <div>@toDoCategory.v.updatedAt</div>
-    <div>@toDoCategory.v.createdAt</div>
+  @for(toDoInfo <- toDoInfoList){
+    <div id="category@toDoInfo._1" class="category">
+      <div><h3>@toDoInfo._2</h3></div>
+      <div>@toDoInfo._3</div>
+      <div>ステータス：@toDoInfo._4</div>
+      <div>カテゴリ：@toDoInfo._5</div>
+      <input class="category_color" type="hidden" value=@toDoInfo._6>
+    </div>
   }
 }
