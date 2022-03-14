@@ -1,45 +1,40 @@
 package controllers
 
-import lib.model.ToDo
+import lib.model.ToDo.ToDoFormData
+import lib.model.{ToDo, ToDoCategory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import lib.persistence.ToDoRepository
-import lib.persistence.ToDoCategoryRepository
+import lib.persistence.onMySQL
+import model.ViewValueToDo
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText, shortNumber, text}
 
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
-import slick.profile.MyDBProfile
-
-case class ToDoFormData(title: String, body: String, category: Short)
 
 @Singleton
-class ListController @Inject() (
-    val controllerComponents: ControllerComponents
+class ListController @Inject()(val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext)
-    extends BaseController
+  extends BaseController
     with I18nSupport {
 
-  val stateMap = Map((0, "TODO(着手前)"), (1, "進行中"), (2, "完了"))
-
   def list() = Action async { implicit request: Request[AnyContent] =>
+    val toDos = onMySQL.ToDoRepository.all()
     for {
-      toDos <- ToDoRepository()(MyDBProfile).all()
-      toDoCategories <- ToDoCategoryRepository()(MyDBProfile).all()
+      toDos <- toDos
+      toDoCategories <- onMySQL.ToDoCategoryRepository.all()
     } yield {
       val toDoInfoList = toDos.map(toDo => {
         toDoCategories.find(toDoCategory =>
           toDo.v.categoryId == toDoCategory.id
         ) match {
           case Some(toDoCategory) =>
-            (
+            ViewValueToDo(
               toDo.v.id,
               toDo.v.title,
               toDo.v.body,
-              stateMap(toDo.v.state),
+              ToDo.States(toDo.v.state).name,
               toDoCategory.v.name,
-              toDoCategory.v.color
+              ToDoCategory.Colors(toDoCategory.v.color).code
             )
         }
       })
@@ -47,18 +42,10 @@ class ListController @Inject() (
     }
   }
 
-  val form = Form(
-    mapping(
-      "title" -> nonEmptyText(maxLength = 255),
-      "body" -> text,
-      "category" -> shortNumber
-    )(ToDoFormData.apply)(ToDoFormData.unapply)
-  )
-
   /** 登録処理実を行う
-    */
+   */
   def store() = Action async { implicit request: Request[AnyContent] =>
-    form
+    ToDo.form
       .bindFromRequest()
       .fold(
         // 処理が失敗した場合に呼び出される関数
@@ -69,10 +56,10 @@ class ListController @Inject() (
         (toDoFormData: ToDoFormData) => {
           for {
             // データを登録。returnのidは不要なので捨てる
-            _ <- ToDoRepository()(MyDBProfile)
+            _ <- onMySQL.ToDoRepository
               .add(
                 ToDo(
-                  toDoFormData.category,
+                  toDoFormData.categoryId.asInstanceOf[ToDoCategory.Id],
                   toDoFormData.title,
                   Option(toDoFormData.body),
                   0

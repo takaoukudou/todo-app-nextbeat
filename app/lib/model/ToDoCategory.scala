@@ -2,7 +2,6 @@ package lib.model
 
 import ixias.model._
 import ixias.util.EnumStatus
-
 import java.time.LocalDateTime
 
 // ユーザーを表すモデル
@@ -10,12 +9,12 @@ import java.time.LocalDateTime
 import lib.model.ToDoCategory._
 
 case class ToDoCategory(
-    id: Option[Id],
-    name: String,
-    slug: String,
-    color: Short,
-    updatedAt: LocalDateTime = NOW,
-    createdAt: LocalDateTime = NOW
+  id: Option[Id],
+  name: String,
+  slug: String,
+  color: Short,
+  updatedAt: LocalDateTime = NOW,
+  createdAt: LocalDateTime = NOW
 ) extends EntityModel[Id]
 
 // コンパニオンオブジェクト
@@ -23,24 +22,25 @@ case class ToDoCategory(
 object ToDoCategory {
 
   val Id = the[Identity[Id]]
-  type Id = Long @@ ToDo
+  type Id = Long @@ ToDoCategory
   type WithNoId = Entity.WithNoId[Id, ToDoCategory]
   type EmbeddedId = Entity.EmbeddedId[Id, ToDoCategory]
 
   // ステータス定義
   //~~~~~~~~~~~~~~~~~
   sealed abstract class Status(val code: Short, val name: String)
-      extends EnumStatus
-  object Status extends EnumStatus.Of[Status] {
-    case object IS_INACTIVE extends Status(code = 0, name = "無効")
-    case object IS_ACTIVE extends Status(code = 100, name = "有効")
+    extends EnumStatus
+  object Colors extends EnumStatus.Of[Status] {
+    case object RED extends Status(code = 1, name = "1")
+    case object BLUE extends Status(code = 2, name = "2")
+    case object GREEN extends Status(code = 3, name = "3")
   }
 
   // INSERT時のIDがAutoincrementのため,IDなしであることを示すオブジェクトに変換
   def apply(
-      name: String,
-      slug: String,
-      color: Short
+    name: String,
+    slug: String,
+    color: Short
   ): WithNoId = {
     new Entity.WithNoId(
       new ToDoCategory(
@@ -48,7 +48,7 @@ object ToDoCategory {
         name = name,
         slug = slug,
         color = color
+        )
       )
-    )
   }
 }

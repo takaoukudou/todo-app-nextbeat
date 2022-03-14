@@ -11,11 +11,8 @@ case class ToDoRepository[P <: JdbcProfile]()(implicit val driver: P)
 
   import api._
 
-//  private val query = new TableQuery(tag => ToDoTable(tag))
   def all(): Future[Seq[EntityEmbeddedId]] =
     RunDBAction(ToDoTable, "slave") { _.result }
-
-//  def all(): Future[Seq[ToDo]] = db.run(query.result)
 
   /** Get ToDo Data
     */

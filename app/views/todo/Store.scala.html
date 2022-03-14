@@ -1,15 +1,13 @@
-@import controllers.ToDoFormData
-@import play.api.i18n.Messages.implicitMessagesProviderToMessages
-@(form:Form[ToDoFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
-
-@common.Default() {
-  @helper.form(action = controllers.routes.ListController.store()) {
-    @helper.inputText(form("title"))
-    @helper.textarea(form("body"))
-    @helper.select(
-      form("category"),
-      options = helper.options(("1","フロントエンド"),("2","バックエンド"),("3","インフラ"))
-    )
-    <input type="submit" value="登録">
-  }
-}
+@import lib.model.ToDo.ToDoFormData
+@(form: Form[ToDoFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+    @common.Default() {
+        @helper.form(action = controllers.routes.ListController.store()) {
+            @helper.inputText(form("title"))
+            @helper.textarea(form("body"))
+            @helper.select(
+                form("categoryId"),
+                options = helper.options(("1", "フロントエンド"), ("2", "バックエンド"), ("3", "インフラ"))
+            )
+            <input type="submit" value="登録">
+        }
+    }

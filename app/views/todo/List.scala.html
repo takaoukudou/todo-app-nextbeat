@@ -1,13 +1,14 @@
-@(toDoInfoList:Seq[(Option[Long],String,Option[String],String,String,Short)])
+@import model.ViewValueToDo
+@(toDoInfoList: Seq[ViewValueToDo])
 
 @common.Default() {
-  @for(toDoInfo <- toDoInfoList){
-    <div id="category@toDoInfo._1" class="category">
-      <div><h3>@toDoInfo._2</h3></div>
-      <div>@toDoInfo._3</div>
-      <div>ステータス：@toDoInfo._4</div>
-      <div>カテゴリ：@toDoInfo._5</div>
-      <input class="category_color" type="hidden" value=@toDoInfo._6>
-    </div>
-  }
+    @for(toDoInfo <- toDoInfoList) {
+        <div id="category@toDoInfo.id" class="category">
+            <div><h3>@toDoInfo.title</h3></div>
+            <div>@toDoInfo.body</div>
+            <div>ステータス：@toDoInfo.stateStr</div>
+            <div>カテゴリ：@toDoInfo.name</div>
+            <input class="category_color" type="hidden" value=@toDoInfo.color>
+        </div>
+    }
 }
