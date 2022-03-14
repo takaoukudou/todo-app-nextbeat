@@ -13,3 +13,4 @@ GET         /todo/list                      controllers.ListController.list
 GET         /todo/store                     controllers.ListController.store
 GET         /todo/$id<[0-9]+>/edit          controllers.ListController.edit(id: Long)
 POST        /todo/$id<[0-9]+>/update        controllers.ListController.update(id: Long)
+POST        /todo/delete                    controllers.ListController.delete

@@ -114,4 +114,16 @@ class ListController @Inject()(val controllerComponents: ControllerComponents
       }
     )
   }
+
+  def delete() = Action async { implicit request: Request[AnyContent] =>
+    val idOpt = request.body.asFormUrlEncoded.get("id").headOption
+    for {
+      result <- onMySQL.ToDoRepository.remove(idOpt.map(_.toLong.asInstanceOf[ToDo.Id]).get)
+    } yield {
+      result match {
+        case None => NotFound(views.html.error.page404())
+        case _ => Redirect(routes.ListController.list())
+      }
+    }
+  }
 }
