@@ -3,7 +3,7 @@ package lib.model
 import ixias.model._
 import ixias.util.EnumStatus
 import play.api.data.Form
-import play.api.data.Forms.{longNumber, mapping, nonEmptyText, text}
+import play.api.data.Forms.{longNumber, mapping, nonEmptyText, optional, text}
 
 import java.time.LocalDateTime
 
@@ -55,17 +55,18 @@ object ToDo {
         title = title,
         body = body,
         state = state
-        )
       )
+    )
   }
 
-  case class ToDoFormData(title: String, body: String, categoryId: Long)
+  case class ToDoFormData(title: String, body: String, categoryId: Long, state: Option[String])
   val form = Form(
     mapping(
       "title" -> nonEmptyText(maxLength = 255),
       "body" -> text,
-      "categoryId" -> longNumber
-      )(ToDoFormData.apply)(ToDoFormData.unapply)
-    )
+      "categoryId" -> longNumber,
+      "state" -> optional(text)
+    )(ToDoFormData.apply)(ToDoFormData.unapply)
+  )
 
 }

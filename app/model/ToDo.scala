@@ -5,6 +5,6 @@ case class ViewValueToDo(
   title: String,
   body: Option[String],
   stateStr: String,
-  name: String,
+  categoryStr: String,
   color: Short,
 )

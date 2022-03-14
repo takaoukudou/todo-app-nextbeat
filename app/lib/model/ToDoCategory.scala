@@ -30,6 +30,12 @@ object ToDoCategory {
   //~~~~~~~~~~~~~~~~~
   sealed abstract class Status(val code: Short, val name: String)
     extends EnumStatus
+
+  object Category extends EnumStatus.Of[Status] {
+    case object RED extends Status(code = 1, name = "フロントエンド")
+    case object BLUE extends Status(code = 2, name = "バックエンド")
+    case object GREEN extends Status(code = 3, name = "インフラ")
+  }
   object Colors extends EnumStatus.Of[Status] {
     case object RED extends Status(code = 1, name = "1")
     case object BLUE extends Status(code = 2, name = "2")
@@ -48,7 +54,7 @@ object ToDoCategory {
         name = name,
         slug = slug,
         color = color
-        )
       )
+    )
   }
 }

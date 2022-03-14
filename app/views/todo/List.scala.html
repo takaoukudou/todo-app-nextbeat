@@ -1,14 +1,17 @@
 @import model.ViewValueToDo
 @(toDoInfoList: Seq[ViewValueToDo])
 
-@common.Default() {
-    @for(toDoInfo <- toDoInfoList) {
-        <div id="category@toDoInfo.id" class="category">
-            <div><h3>@toDoInfo.title</h3></div>
-            <div>@toDoInfo.body</div>
-            <div>ステータス：@toDoInfo.stateStr</div>
-            <div>カテゴリ：@toDoInfo.name</div>
-            <input class="category_color" type="hidden" value=@toDoInfo.color>
-        </div>
+    @common.Default() {
+        @for(toDoInfo <- toDoInfoList) {
+            <div id="category@toDoInfo.id" class="category">
+                <div><h3>@toDoInfo.title</h3></div>
+                <div>@toDoInfo.body</div>
+                <div>ステータス：@toDoInfo.stateStr</div>
+                <div>カテゴリ：@toDoInfo.categoryStr</div>
+                <input class="category_color" type="hidden" value=@toDoInfo.color>
+                <a href="@controllers.routes.ListController.edit(toDoInfo.id.getOrElse(0))">
+                    <button type="button">編集</button>
+                </a>
+            </div>
+        }
     }
-}
