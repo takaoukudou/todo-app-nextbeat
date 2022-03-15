@@ -1,6 +1,6 @@
 package controllers
 
-import lib.model.ToDo.ToDoFormData
+import model.ViewValueToDo.ToDoFormData
 import lib.model.{ToDo, ToDoCategory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -12,21 +12,16 @@ import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ListController @Inject()(val controllerComponents: ControllerComponents
-)(implicit ec: ExecutionContext)
-  extends BaseController
-    with I18nSupport {
+class ListController @Inject() (val controllerComponents: ControllerComponents)(implicit ec: ExecutionContext) extends BaseController with I18nSupport {
 
   def list() = Action async { implicit request: Request[AnyContent] =>
     val toDos = onMySQL.ToDoRepository.all()
     for {
-      toDos <- toDos
       toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+      toDos          <- toDos
     } yield {
       val toDoInfoList = toDos.map(toDo => {
-        toDoCategories.find(toDoCategory =>
-          toDo.v.categoryId == toDoCategory.id
-        ) match {
+        toDoCategories.find(toDoCategory => toDo.v.categoryId == toDoCategory.id) match {
           case Some(toDoCategory) =>
             ViewValueToDo(
               toDo.v.id,
@@ -43,9 +38,9 @@ class ListController @Inject()(val controllerComponents: ControllerComponents
   }
 
   /** 登録処理実を行う
-   */
+    */
   def store() = Action async { implicit request: Request[AnyContent] =>
-    ToDo.form
+    ViewValueToDo.form
       .bindFromRequest()
       .fold(
         // 処理が失敗した場合に呼び出される関数
@@ -57,14 +52,14 @@ class ListController @Inject()(val controllerComponents: ControllerComponents
           for {
             // データを登録。returnのidは不要なので捨てる
             _ <- onMySQL.ToDoRepository
-              .add(
-                ToDo(
-                  toDoFormData.categoryId.asInstanceOf[ToDoCategory.Id],
-                  toDoFormData.title,
-                  Option(toDoFormData.body),
-                  0
-                )
-              )
+                   .add(
+                     ToDo(
+                       toDoFormData.categoryId,
+                       toDoFormData.title,
+                       Option(toDoFormData.body),
+                       0
+                     )
+                   )
           } yield {
             Redirect(routes.ListController.list())
           }
