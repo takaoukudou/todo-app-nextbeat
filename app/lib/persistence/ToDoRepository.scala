@@ -5,19 +5,21 @@ import ixias.persistence.SlickRepository
 import lib.model.ToDo
 import slick.jdbc.JdbcProfile
 
-case class ToDoRepository[P <: JdbcProfile]()(implicit val driver: P)
-    extends SlickRepository[ToDo.Id, ToDo, P]
-    with db.SlickResourceProvider[P] {
+case class ToDoRepository[P <: JdbcProfile]()(implicit val driver: P) extends SlickRepository[ToDo.Id, ToDo, P] with db.SlickResourceProvider[P] {
 
   import api._
 
   def all(): Future[Seq[EntityEmbeddedId]] =
-    RunDBAction(ToDoTable, "slave") { _.result }
+    RunDBAction(ToDoTable, "slave") {
+      _.result
+    }
 
   /** Get ToDo Data
     */
   def get(id: Id): Future[Option[EntityEmbeddedId]] =
-    RunDBAction(ToDoTable, "slave") { _.filter(_.id === id).result.headOption }
+    RunDBAction(ToDoTable, "slave") {
+      _.filter(_.id === id).result.headOption
+    }
 
   /** Add ToDo Data
     */
@@ -32,10 +34,10 @@ case class ToDoRepository[P <: JdbcProfile]()(implicit val driver: P)
       val row = slick.filter(_.id === entity.id)
       for {
         old <- row.result.headOption
-        _ <- old match {
-          case None    => DBIO.successful(0)
-          case Some(_) => row.update(entity.v)
-        }
+        _   <- old match {
+                 case None    => DBIO.successful(0)
+                 case Some(_) => row.update(entity.v)
+               }
       } yield old
     }
 
@@ -45,10 +47,10 @@ case class ToDoRepository[P <: JdbcProfile]()(implicit val driver: P)
       val row = slick.filter(_.id === id)
       for {
         old <- row.result.headOption
-        _ <- old match {
-          case None    => DBIO.successful(0)
-          case Some(_) => row.delete
-        }
+        _   <- old match {
+                 case None    => DBIO.successful(0)
+                 case Some(_) => row.delete
+               }
       } yield old
     }
 }
