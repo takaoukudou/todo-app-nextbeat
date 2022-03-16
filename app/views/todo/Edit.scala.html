@@ -1,5 +1,7 @@
 @import model.ViewValueToDo.ToDoFormData
-@(id: Long, form: Form[ToDoFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@import model.ViewValueToDoCategory
+@import lib.model.ToDo
+@(id: Long, toDoCategories: Seq[ViewValueToDoCategory], form: Form[ToDoFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
     @common.Default() {
         @helper.form(action = controllers.routes.ListController.update(id)) {
@@ -11,12 +13,14 @@
                 '_label -> "本文")
             @helper.select(
                 form("state"),
-                options = helper.options(("0", "TODO(着手前)"), ("1", "進行中"), ("2", "完了")),
+                options = helper.options((ToDo.States.TODO.code.toString, ToDo.States.TODO.name),
+                    (ToDo.States.DOING.code.toString, ToDo.States.DOING.name),
+                    (ToDo.States.DONE.code.toString, ToDo.States.DONE.name)),
                 '_label -> "ステータス"
             )
             @helper.select(
                 form("categoryId"),
-                options = helper.options(("1", "フロントエンド"), ("2", "バックエンド"), ("3", "インフラ")),
+                options = toDoCategories.map(toDoCategory => (toDoCategory.id.getOrElse(-1).toString, toDoCategory.name)),
                 '_label -> "カテゴリ"
             )
             <input type="submit" value="更新">

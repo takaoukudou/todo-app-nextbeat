@@ -2,6 +2,7 @@ package controllers
 
 import model.ViewValueToDo.ToDoFormData
 import lib.model.{ToDo, ToDoCategory}
+import lib.persistence
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import lib.persistence.onMySQL
@@ -37,12 +38,15 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
     }
   }
 
+  private def getViewValueToDoCategories(toDoCategories: Seq[persistence.onMySQL.ToDoCategoryRepository.EntityEmbeddedId]) = {
+    toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
+  }
+
   def register() = Action async { implicit request: Request[AnyContent] =>
     for {
       toDoCategories <- onMySQL.ToDoCategoryRepository.all()
     } yield {
-      val viewValueToDoCategories = toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
-      Ok(views.html.todo.Store(viewValueToDoCategories, ViewValueToDo.form))
+      Ok(views.html.todo.Store(getViewValueToDoCategories(toDoCategories), ViewValueToDo.form))
     }
   }
 
@@ -57,8 +61,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
           for {
             toDoCategories <- onMySQL.ToDoCategoryRepository.all()
           } yield {
-            val viewValueToDoCategories = toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
-            BadRequest(views.html.todo.Store(viewValueToDoCategories, formWithErrors))
+            BadRequest(views.html.todo.Store(getViewValueToDoCategories(toDoCategories), formWithErrors))
           }
         },
         // 処理が成功した場合に呼び出される関数
@@ -82,14 +85,17 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
   }
 
   def edit(id: Long) = Action async { implicit request: Request[AnyContent] =>
+    val toDoCategories = onMySQL.ToDoCategoryRepository.all()
     for {
-      toDo <- onMySQL.ToDoRepository.get(id.asInstanceOf[ToDo.Id])
+      toDo           <- onMySQL.ToDoRepository.get(id.asInstanceOf[ToDo.Id])
+      toDoCategories <- toDoCategories
     } yield {
       toDo match {
         case Some(toDo) =>
           Ok(
             views.html.todo.Edit(
               toDo.v.id.getOrElse(0),
+              getViewValueToDoCategories(toDoCategories),
               ViewValueToDo.form
             )
           )
@@ -103,7 +109,11 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
       .bindFromRequest()
       .fold(
         (formWithErrors: Form[ToDoFormData]) => {
-          Future.successful(BadRequest(views.html.todo.Edit(id, formWithErrors)))
+          for {
+            toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+          } yield {
+            BadRequest(views.html.todo.Edit(id, getViewValueToDoCategories(toDoCategories), formWithErrors))
+          }
         },
         (data: ToDoFormData) => {
           for {
@@ -114,8 +124,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
                             toDo.map(
                               _.copy(
                                 title      = data.title,
-                                categoryId = data.categoryId
-                                  .asInstanceOf[ToDoCategory.Id],
+                                categoryId = data.categoryId,
                                 body       = Some(data.body),
                                 state      = data.state.get.toShort
                               )
@@ -134,15 +143,17 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
 
   def delete() = Action async { implicit request: Request[AnyContent] =>
     val idOpt = request.body.asFormUrlEncoded.get("id").headOption
-    for {
-      result <- onMySQL.ToDoRepository.remove(
-                  idOpt.map(_.toLong.asInstanceOf[ToDo.Id]).get
-                )
-    } yield {
-      result match {
-        case None => NotFound(views.html.error.page404())
-        case _    => Redirect(routes.ListController.list())
-      }
+    idOpt match {
+      case None     => Future.successful(NotFound(views.html.error.page404()))
+      case Some(id) =>
+        for {
+          result <- onMySQL.ToDoRepository.remove(id.toLong.asInstanceOf[ToDo.Id])
+        } yield {
+          result match {
+            case None => NotFound(views.html.error.page404())
+            case _    => Redirect(routes.ListController.list())
+          }
+        }
     }
   }
 }
