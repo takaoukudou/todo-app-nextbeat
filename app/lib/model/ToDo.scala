@@ -2,14 +2,12 @@ package lib.model
 
 import ixias.model._
 import ixias.util.EnumStatus
-import play.api.data.Form
-import play.api.data.Forms.{longNumber, mapping, nonEmptyText, text}
 
 import java.time.LocalDateTime
 
 // ユーザーを表すモデル
 //~~~~~~~~~~~~~~~~~~~~
-import ToDo._
+import lib.model.ToDo._
 
 case class ToDo(
     id:         Option[Id],

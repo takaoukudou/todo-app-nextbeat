@@ -5,11 +5,10 @@ import lib.model.{ToDo, ToDoCategory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import lib.persistence.onMySQL
-import model.ViewValueToDo
+import model.{ViewValueToDo, ViewValueToDoCategory}
 import play.api.data.Form
-
 import javax.inject._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ListController @Inject() (val controllerComponents: ControllerComponents)(implicit ec: ExecutionContext) extends BaseController with I18nSupport {
@@ -37,6 +36,15 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
     }
   }
 
+  def register() = Action async { implicit request: Request[AnyContent] =>
+    for {
+      toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+    } yield {
+      val viewValueToDoCategories = toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
+      Ok(views.html.todo.Store(viewValueToDoCategories, ViewValueToDo.form))
+    }
+  }
+
   /** 登録処理実を行う
     */
   def store() = Action async { implicit request: Request[AnyContent] =>
@@ -45,7 +53,12 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
       .fold(
         // 処理が失敗した場合に呼び出される関数
         (formWithErrors: Form[ToDoFormData]) => {
-          Future.successful(BadRequest(views.html.todo.Store(formWithErrors)))
+          for {
+            toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+          } yield {
+            val viewValueToDoCategories = toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
+            BadRequest(views.html.todo.Store(viewValueToDoCategories, formWithErrors))
+          }
         },
         // 処理が成功した場合に呼び出される関数
         (toDoFormData: ToDoFormData) => {
@@ -57,7 +70,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
                        toDoFormData.categoryId,
                        toDoFormData.title,
                        Option(toDoFormData.body),
-                       0
+                       ToDo.States.TODO.code
                      )
                    )
           } yield {
