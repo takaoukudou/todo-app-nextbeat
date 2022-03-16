@@ -1,28 +1,24 @@
 package controllers
 
-import lib.model.ToDo.{ToDoFormData, form}
+import model.ViewValueToDo.ToDoFormData
 import lib.model.{ToDo, ToDoCategory}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import lib.persistence.onMySQL
-import model.ViewValueToDo
-import lib.model
+import model.{ViewValueToDo, ViewValueToDoCategory}
 import play.api.data.Form
 
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ListController @Inject() (val controllerComponents: ControllerComponents)(implicit
-    ec:                                                   ExecutionContext
-) extends BaseController
-    with I18nSupport {
+class ListController @Inject() (val controllerComponents: ControllerComponents)(implicit ec: ExecutionContext) extends BaseController with I18nSupport {
 
   def list() = Action async { implicit request: Request[AnyContent] =>
     val toDos = onMySQL.ToDoRepository.all()
     for {
-      toDos          <- toDos
       toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+      toDos          <- toDos
     } yield {
       val toDoInfoList = toDos.map(toDo => {
         toDoCategories.find(toDoCategory => toDo.v.categoryId == toDoCategory.id) match {
@@ -41,15 +37,29 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
     }
   }
 
+  def register() = Action async { implicit request: Request[AnyContent] =>
+    for {
+      toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+    } yield {
+      val viewValueToDoCategories = toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
+      Ok(views.html.todo.Store(viewValueToDoCategories, ViewValueToDo.form))
+    }
+  }
+
   /** 登録処理実を行う
     */
   def store() = Action async { implicit request: Request[AnyContent] =>
-    ToDo.form
+    ViewValueToDo.form
       .bindFromRequest()
       .fold(
         // 処理が失敗した場合に呼び出される関数
         (formWithErrors: Form[ToDoFormData]) => {
-          Future.successful(BadRequest(views.html.todo.Store(formWithErrors)))
+          for {
+            toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+          } yield {
+            val viewValueToDoCategories = toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name))
+            BadRequest(views.html.todo.Store(viewValueToDoCategories, formWithErrors))
+          }
         },
         // 処理が成功した場合に呼び出される関数
         (toDoFormData: ToDoFormData) => {
@@ -58,7 +68,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
             _ <- onMySQL.ToDoRepository
                    .add(
                      ToDo(
-                       toDoFormData.categoryId.asInstanceOf[ToDoCategory.Id],
+                       toDoFormData.categoryId,
                        toDoFormData.title,
                        Option(toDoFormData.body),
                        ToDo.States.TODO.code
@@ -80,7 +90,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
           Ok(
             views.html.todo.Edit(
               toDo.v.id.getOrElse(0),
-              form
+              ViewValueToDo.form
             )
           )
         case None       => NotFound(views.html.error.page404())
@@ -89,12 +99,11 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
   }
 
   def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    ToDo.form
+    ViewValueToDo.form
       .bindFromRequest()
       .fold(
         (formWithErrors: Form[ToDoFormData]) => {
-          Future
-            .successful(BadRequest(views.html.todo.Edit(id, formWithErrors)))
+          Future.successful(BadRequest(views.html.todo.Edit(id, formWithErrors)))
         },
         (data: ToDoFormData) => {
           for {
@@ -106,7 +115,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
                               _.copy(
                                 title      = data.title,
                                 categoryId = data.categoryId
-                                  .asInstanceOf[model.ToDoCategory.Id],
+                                  .asInstanceOf[ToDoCategory.Id],
                                 body       = Some(data.body),
                                 state      = data.state.get.toShort
                               )

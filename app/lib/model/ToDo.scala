@@ -9,11 +9,11 @@ import java.time.LocalDateTime
 
 // ユーザーを表すモデル
 //~~~~~~~~~~~~~~~~~~~~
-import ToDo._
+import lib.model.ToDo._
 
 case class ToDo(
     id:         Option[Id],
-    categoryId: Long @@ ToDoCategory,
+    categoryId: ToDoCategory.Id,
     title:      String,
     body:       Option[String] = None,
     state:      Short,
@@ -42,7 +42,7 @@ object ToDo {
 
   // INSERT時のIDがAutoincrementのため,IDなしであることを示すオブジェクトに変換
   def apply(
-      categoryId: Long @@ ToDoCategory,
+      categoryId: ToDoCategory.Id,
       title:      String,
       body:       Option[String],
       state:      Short
@@ -57,15 +57,4 @@ object ToDo {
       )
     )
   }
-
-  case class ToDoFormData(title: String, body: String, categoryId: Long, state: Option[String])
-  val form = Form(
-    mapping(
-      "title"      -> nonEmptyText(maxLength = 255),
-      "body"       -> text,
-      "categoryId" -> longNumber,
-      "state"      -> optional(text)
-    )(ToDoFormData.apply)(ToDoFormData.unapply)
-  )
-
 }
