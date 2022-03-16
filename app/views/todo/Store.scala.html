@@ -1,0 +1,15 @@
+@import model.ViewValueToDo.ToDoFormData
+@import model.ViewValueToDoCategory
+@(toDoCategories: Seq[ViewValueToDoCategory], form: Form[ToDoFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+@common.Default() {
+    @helper.form(action = controllers.routes.ListController.store()) {
+        @helper.CSRF.formField
+        @helper.inputText(form("title"))
+        @helper.textarea(form("body"))
+        @helper.select(
+            form("categoryId"),
+            options = toDoCategories.map(toDoCategory => (toDoCategory.id.getOrElse(-1).toString, toDoCategory.name))
+        )
+        <input type="submit" value="登録">
+    }
+}

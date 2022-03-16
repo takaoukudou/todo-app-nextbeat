@@ -4,7 +4,8 @@
 * two arguments, a `String` for the title of the page and an `Html`
 * object to insert into the body of the page.
 *@
-@(vv: model.ViewValueCommon)(content: Html)
+@import model.ViewValueHome
+@(vv: model.ViewValueCommon = ViewValueHome("",Seq("main.css"),Seq("main.js")))(content: Html)
 
 <!DOCTYPE html>
 <html lang="ja">

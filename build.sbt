@@ -17,11 +17,17 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "net.ixias" %% "ixias"      % "1.1.36",
-  "net.ixias" %% "ixias-aws"  % "1.1.36",
+  guice,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
+  "com.typesafe.play" %% "play-slick" % "3.0.3",
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
+  "mysql" % "mysql-connector-java" % "5.1.47",
+  "com.typesafe.slick" %% "slick-codegen" % "3.3.2",
+  "com.typesafe" % "config" % "1.4.0",
+  "net.ixias" %% "ixias" % "1.1.36",
+  "net.ixias" %% "ixias-aws" % "1.1.36",
   "net.ixias" %% "ixias-play" % "1.1.36",
-  "mysql"          % "mysql-connector-java" % "5.1.+",
-  "ch.qos.logback" % "logback-classic"      % "1.1.+",
+  "ch.qos.logback" % "logback-classic" % "1.1.+"
 )
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
