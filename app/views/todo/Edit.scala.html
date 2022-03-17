@@ -13,9 +13,7 @@
                 '_label -> "本文")
             @helper.select(
                 form("state"),
-                options = helper.options((ToDo.States.TODO.code.toString, ToDo.States.TODO.name),
-                    (ToDo.States.DOING.code.toString, ToDo.States.DOING.name),
-                    (ToDo.States.DONE.code.toString, ToDo.States.DONE.name)),
+                options = ToDo.States.values.map(toDoState => (toDoState.code.toString, toDoState.name)),
                 '_label -> "ステータス"
             )
             @helper.select(

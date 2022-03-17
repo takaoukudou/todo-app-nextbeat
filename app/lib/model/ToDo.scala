@@ -2,8 +2,6 @@ package lib.model
 
 import ixias.model._
 import ixias.util.EnumStatus
-import play.api.data.Form
-import play.api.data.Forms.{longNumber, mapping, nonEmptyText, optional, text}
 
 import java.time.LocalDateTime
 
@@ -32,12 +30,12 @@ object ToDo {
 
   // ステータス定義
   //~~~~~~~~~~~~~~~~~
-  sealed abstract class Status(val code: Short, val name: String) extends EnumStatus
+  sealed abstract class States(val code: Short, val name: String) extends EnumStatus
 
-  object States extends EnumStatus.Of[Status] {
-    case object TODO  extends Status(code = 0, name = "TODO(着手前)")
-    case object DOING extends Status(code = 1, name = "進行中")
-    case object DONE  extends Status(code = 2, name = "完了")
+  object States extends EnumStatus.Of[States] {
+    case object TODO  extends States(code = 0, name = "TODO(着手前)")
+    case object DOING extends States(code = 1, name = "進行中")
+    case object DONE  extends States(code = 2, name = "完了")
   }
 
   // INSERT時のIDがAutoincrementのため,IDなしであることを示すオブジェクトに変換
