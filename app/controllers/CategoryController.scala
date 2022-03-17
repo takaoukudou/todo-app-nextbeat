@@ -76,7 +76,7 @@ class CategoryController @Inject() (val controllerComponents: ControllerComponen
           Ok(
             views.html.category.Edit(
               toDoCategory.v.id.getOrElse(0),
-              ViewValueToDoCategory.form
+              ViewValueToDoCategory.form.fill(ToDoCategoryFormData(toDoCategory.v.name, toDoCategory.v.slug, toDoCategory.v.color))
             )
           )
         case None               => NotFound(views.html.error.page404())
