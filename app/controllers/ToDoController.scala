@@ -2,7 +2,6 @@ package controllers
 
 import model.ViewValueToDo.ToDoFormData
 import lib.model.{ToDo, ToDoCategory}
-import lib.persistence
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import lib.persistence.onMySQL
@@ -29,8 +28,17 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
               toDo.v.title,
               toDo.v.body,
               ToDo.States(toDo.v.state).name,
-              ToDoCategory.Category(toDo.v.categoryId.toShort).name,
+              toDoCategory.v.name,
               ToDoCategory.Colors(toDoCategory.v.color).code
+            )
+          case _                  =>
+            ViewValueToDo(
+              toDo.v.id,
+              toDo.v.title,
+              toDo.v.body,
+              ToDo.States(toDo.v.state).name,
+              "なし",
+              -1
             )
         }
       })
@@ -38,7 +46,7 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
     }
   }
 
-  private def getViewValueToDoCategories(toDoCategories: Seq[persistence.onMySQL.ToDoCategoryRepository.EntityEmbeddedId]) = {
+  private def getViewValueToDoCategories(toDoCategories: Seq[ToDoCategory.EmbeddedId]) = {
     toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name, toDoCategory.v.slug, toDoCategory.v.color))
   }
 
@@ -118,19 +126,27 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
         (data: ToDoFormData) => {
           for {
             oToDo  <- onMySQL.ToDoRepository.get(id.asInstanceOf[ToDo.Id])
-            result <- onMySQL.ToDoRepository.update(
-                        oToDo match {
-                          case Some(toDo) =>
-                            toDo.map(
-                              _.copy(
-                                title      = data.title,
-                                categoryId = data.categoryId,
-                                body       = Some(data.body),
-                                state      = data.state.get.toShort
-                              )
-                            )
-                        }
+            result <- {
+              oToDo match {
+                case Some(toDo) =>
+                  onMySQL.ToDoRepository.update(
+                    toDo.map(
+                      _.copy(
+                        title      = data.title,
+                        categoryId = data.categoryId,
+                        body       = Some(data.body),
+                        state      = data.state.get.toShort
                       )
+                    )
+                  )
+                case None       =>
+                  for {
+                    toDoCategories <- onMySQL.ToDoCategoryRepository.all()
+                  } yield {
+                    BadRequest(views.html.todo.Edit(id, getViewValueToDoCategories(toDoCategories), ViewValueToDo.form))
+                  }
+              }
+            }
           } yield {
             result match {
               case Some(_) => Redirect(routes.ToDoController.list())

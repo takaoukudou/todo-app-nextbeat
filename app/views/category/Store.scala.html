@@ -1,21 +1,17 @@
 @import lib.model.ToDoCategory
 @import model.ViewValueToDoCategory.ToDoCategoryFormData
 @(form: Form[ToDoCategoryFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
-@common.Default() {
-    @helper.form(action = controllers.routes.CategoryController.store()) {
-        @helper.CSRF.formField
-        @helper.inputText(form("name"),
-            '_label -> "カテゴリ名")
-        @helper.inputText(form("slug"),
-            '_label -> "スラッグ")
-        @helper.select(
-            form("color"),
-            options = helper.options((ToDoCategory.Colors.RED.code.toString, ToDoCategory.Colors.RED.name),
-                (ToDoCategory.Colors.BLUE.code.toString, ToDoCategory.Colors.BLUE.name),
-                (ToDoCategory.Colors.GREEN.code.toString, ToDoCategory.Colors.GREEN.name),
-                (ToDoCategory.Colors.YELLOW.code.toString, ToDoCategory.Colors.YELLOW.name),
-                (ToDoCategory.Colors.PINK.code.toString, ToDoCategory.Colors.PINK.name)),
-            '_label -> "カラー")
-        <input type="submit" value="登録">
+    @common.Default() {
+        @helper.form(action = controllers.routes.CategoryController.store()) {
+            @helper.CSRF.formField
+            @helper.inputText(form("name"),
+                '_label -> "カテゴリ名")
+            @helper.inputText(form("slug"),
+                '_label -> "スラッグ")
+            @helper.select(
+                form("color"),
+                options = ToDoCategory.Colors.values.map(color => (color.code.toString, color.name)),
+                '_label -> "カラー")
+            <input type="submit" value="登録">
+        }
     }
-}

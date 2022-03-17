@@ -12,11 +12,7 @@
             '_label -> "スラッグ")
         @helper.select(
             form("color"),
-            options = helper.options((ToDoCategory.Colors.RED.code.toString, ToDoCategory.Colors.RED.name),
-                (ToDoCategory.Colors.BLUE.code.toString, ToDoCategory.Colors.BLUE.name),
-                (ToDoCategory.Colors.GREEN.code.toString, ToDoCategory.Colors.GREEN.name),
-                (ToDoCategory.Colors.YELLOW.code.toString, ToDoCategory.Colors.YELLOW.name),
-                (ToDoCategory.Colors.PINK.code.toString, ToDoCategory.Colors.PINK.name)),
+            options = ToDoCategory.Colors.values.map(color => (color.code.toString, color.name)),
             '_label -> "カラー"
         )
         <input type="submit" value="更新">
