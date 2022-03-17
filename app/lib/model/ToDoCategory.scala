@@ -36,9 +36,11 @@ object ToDoCategory {
     case object GREEN extends Status(code = 3, name = "インフラ")
   }
   object Colors   extends EnumStatus.Of[Status] {
-    case object RED   extends Status(code = 1, name = "1")
-    case object BLUE  extends Status(code = 2, name = "2")
-    case object GREEN extends Status(code = 3, name = "3")
+    case object RED    extends Status(code = 1, name = "レッド")
+    case object BLUE   extends Status(code = 2, name = "ブルー")
+    case object GREEN  extends Status(code = 3, name = "グリーン")
+    case object YELLOW extends Status(code = 4, name = "イエロー")
+    case object PINK   extends Status(code = 5, name = "ピンク")
   }
 
   // INSERT時のIDがAutoincrementのため,IDなしであることを示すオブジェクトに変換
