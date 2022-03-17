@@ -24,7 +24,7 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
         toDoCategories.find(toDoCategory => toDo.v.categoryId == toDoCategory.id) match {
           case Some(toDoCategory) =>
             ViewValueToDo(
-              toDo.v.id,
+              toDo.id,
               toDo.v.title,
               toDo.v.body,
               ToDo.States(toDo.v.state).name,
@@ -33,7 +33,7 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
             )
           case _                  =>
             ViewValueToDo(
-              toDo.v.id,
+              toDo.id,
               toDo.v.title,
               toDo.v.body,
               ToDo.States(toDo.v.state).name,
@@ -47,7 +47,7 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
   }
 
   private def getViewValueToDoCategories(toDoCategories: Seq[ToDoCategory.EmbeddedId]) = {
-    toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.v.id, toDoCategory.v.name, toDoCategory.v.slug, toDoCategory.v.color))
+    toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.id, toDoCategory.v.name, toDoCategory.v.slug, toDoCategory.v.color))
   }
 
   def register() = Action async { implicit request: Request[AnyContent] =>

@@ -20,7 +20,7 @@ class CategoryController @Inject() (val controllerComponents: ControllerComponen
     } yield {
       val toDoCategoryInfoList = toDoCategories.map(toDoCategory => {
         ViewValueToDoCategory(
-          toDoCategory.v.id,
+          toDoCategory.id,
           toDoCategory.v.name,
           toDoCategory.v.slug,
           ToDoCategory.Colors(toDoCategory.v.color).code

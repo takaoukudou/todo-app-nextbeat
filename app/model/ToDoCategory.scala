@@ -1,11 +1,11 @@
 package model
 
-import lib.model.ToDoCategory.Id
+import lib.model.ToDoCategory
 import play.api.data.Form
 import play.api.data.Forms.{mapping, nonEmptyText, shortNumber}
 
 case class ViewValueToDoCategory(
-    id:    Option[Id],
+    id:    ToDoCategory.Id,
     name:  String,
     slug:  String,
     color: Short

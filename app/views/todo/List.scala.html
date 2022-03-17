@@ -11,7 +11,7 @@
                     <div>ステータス：@toDoInfo.stateStr</div>
                     <div>カテゴリ：@toDoInfo.categoryStr</div>
                     <input class="category_color" type="hidden" value=@toDoInfo.color>
-                    <a href="@controllers.routes.ToDoController.edit(toDoInfo.id.getOrElse(0))">
+                    <a href="@controllers.routes.ToDoController.edit(toDoInfo.id)">
                         <button type="button">編集</button>
                     </a>
                     <div>

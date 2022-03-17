@@ -1,11 +1,11 @@
 package model
 
-import lib.model.ToDoCategory
+import lib.model.{ToDo, ToDoCategory}
 import play.api.data.Form
 import play.api.data.Forms.{longNumber, mapping, nonEmptyText, optional, text}
 
 case class ViewValueToDo(
-    id:          Option[Long],
+    id:          ToDo.Id,
     title:       String,
     body:        Option[String],
     stateStr:    String,
