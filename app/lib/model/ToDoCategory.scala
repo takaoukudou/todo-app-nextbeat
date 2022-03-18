@@ -29,11 +29,12 @@ object ToDoCategory {
   // ステータス定義
   //~~~~~~~~~~~~~~~~~
   sealed abstract class Colors(val code: Short, val name: String) extends EnumStatus
-
   object Colors extends EnumStatus.Of[Colors] {
-    case object RED   extends Colors(code = 1, name = "レッド")
-    case object BLUE  extends Colors(code = 2, name = "ブルー")
-    case object GREEN extends Colors(code = 3, name = "グリーン")
+    case object RED    extends Colors(code = 1, name = "レッド")
+    case object BLUE   extends Colors(code = 2, name = "ブルー")
+    case object GREEN  extends Colors(code = 3, name = "グリーン")
+    case object YELLOW extends Colors(code = 4, name = "イエロー")
+    case object PINK   extends Colors(code = 5, name = "ピンク")
   }
 
   // INSERT時のIDがAutoincrementのため,IDなしであることを示すオブジェクトに変換

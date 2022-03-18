@@ -2,7 +2,7 @@
 @(toDoInfoList: Seq[ViewValueToDo])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
     @common.Default() {
         @for(toDoInfo <- toDoInfoList) {
-            @helper.form(action = controllers.routes.ListController.delete()) {
+            @helper.form(action = controllers.routes.ToDoController.delete()) {
                 @helper.CSRF.formField
                 <div id="category@toDoInfo.id" class="category" >
                     <input type="hidden" value="@toDoInfo.id" name="id">
@@ -11,7 +11,7 @@
                     <div>ステータス：@toDoInfo.stateStr</div>
                     <div>カテゴリ：@toDoInfo.categoryStr</div>
                     <input class="category_color" type="hidden" value=@toDoInfo.color>
-                    <a href="@controllers.routes.ListController.edit(toDoInfo.id)">
+                    <a href="@controllers.routes.ToDoController.edit(toDoInfo.id)">
                         <button type="button">編集</button>
                     </a>
                     <div>

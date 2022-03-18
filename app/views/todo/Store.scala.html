@@ -2,7 +2,7 @@
 @import model.ViewValueToDoCategory
 @(toDoCategories: Seq[ViewValueToDoCategory], form: Form[ToDoFormData])(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
     @common.Default() {
-        @helper.form(action = controllers.routes.ListController.store()) {
+        @helper.form(action = controllers.routes.ToDoController.store()) {
             @helper.CSRF.formField
             @helper.inputText(form("title"),
                 '_label -> "タイトル")

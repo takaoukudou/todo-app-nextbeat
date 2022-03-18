@@ -12,7 +12,7 @@ import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ListController @Inject() (val controllerComponents: ControllerComponents)(implicit ec: ExecutionContext) extends BaseController with I18nSupport {
+class ToDoController @Inject() (val controllerComponents: ControllerComponents)(implicit ec: ExecutionContext) extends BaseController with I18nSupport {
 
   def list() = Action async { implicit request: Request[AnyContent] =>
     val toDos = onMySQL.ToDoRepository.all()
@@ -21,24 +21,22 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
       toDos          <- toDos
     } yield {
       val toDoInfoList = toDos.map(toDo => {
-        toDoCategories.find(toDoCategory => toDo.v.categoryId == toDoCategory.id) match {
-          case Some(toDoCategory) =>
-            ViewValueToDo(
-              toDo.id,
-              toDo.v.title,
-              toDo.v.body,
-              ToDo.States(toDo.v.state).name,
-              toDoCategory.v.name,
-              ToDoCategory.Colors(toDoCategory.v.color).code
-            )
-        }
+        val categoryOpt = toDoCategories.find(_.id == toDo.v.categoryId).map(_.v)
+        ViewValueToDo(
+          toDo.id,
+          toDo.v.title,
+          toDo.v.body,
+          ToDo.States(toDo.v.state).name,
+          categoryOpt.map(_.name).getOrElse("なし"),
+          categoryOpt.map(_.color).getOrElse(-1)
+        )
       })
       Ok(views.html.todo.List(toDoInfoList))
     }
   }
 
   private def getViewValueToDoCategories(toDoCategories: Seq[ToDoCategory.EmbeddedId]) = {
-    toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.id, toDoCategory.v.name))
+    toDoCategories.map(toDoCategory => ViewValueToDoCategory(toDoCategory.id, toDoCategory.v.name, toDoCategory.v.slug, toDoCategory.v.color))
   }
 
   def register() = Action async { implicit request: Request[AnyContent] =>
@@ -77,7 +75,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
                      )
                    )
           } yield {
-            Redirect(routes.ListController.list())
+            Redirect(routes.ToDoController.list())
           }
         }
       )
@@ -140,7 +138,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
             }
           } yield {
             result match {
-              case Some(_) => Redirect(routes.ListController.list())
+              case Some(_) => Redirect(routes.ToDoController.list())
               case _       => NotFound(views.html.error.page404())
             }
           }
@@ -158,7 +156,7 @@ class ListController @Inject() (val controllerComponents: ControllerComponents)(
         } yield {
           result match {
             case None => NotFound(views.html.error.page404())
-            case _    => Redirect(routes.ListController.list())
+            case _    => Redirect(routes.ToDoController.list())
           }
         }
     }
