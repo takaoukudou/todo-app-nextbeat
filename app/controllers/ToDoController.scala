@@ -21,26 +21,15 @@ class ToDoController @Inject() (val controllerComponents: ControllerComponents)(
       toDos          <- toDos
     } yield {
       val toDoInfoList = toDos.map(toDo => {
-        toDoCategories.find(toDoCategory => toDo.v.categoryId == toDoCategory.id) match {
-          case Some(toDoCategory) =>
-            ViewValueToDo(
-              toDo.id,
-              toDo.v.title,
-              toDo.v.body,
-              ToDo.States(toDo.v.state).name,
-              toDoCategory.v.name,
-              ToDoCategory.Colors(toDoCategory.v.color).code
-            )
-          case _                  =>
-            ViewValueToDo(
-              toDo.id,
-              toDo.v.title,
-              toDo.v.body,
-              ToDo.States(toDo.v.state).name,
-              "なし",
-              -1
-            )
-        }
+        val categoryOpt = toDoCategories.find(_.id == toDo.v.categoryId).map(_.v)
+        ViewValueToDo(
+          toDo.id,
+          toDo.v.title,
+          toDo.v.body,
+          ToDo.States(toDo.v.state).name,
+          categoryOpt.map(_.name).getOrElse("なし"),
+          categoryOpt.map(_.color).getOrElse(-1)
+        )
       })
       Ok(views.html.todo.List(toDoInfoList))
     }

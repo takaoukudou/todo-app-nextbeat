@@ -23,7 +23,7 @@ class CategoryController @Inject() (val controllerComponents: ControllerComponen
           toDoCategory.id,
           toDoCategory.v.name,
           toDoCategory.v.slug,
-          ToDoCategory.Colors(toDoCategory.v.color).code
+          toDoCategory.v.color
         )
       })
       Ok(views.html.category.List(toDoCategoryInfoList))
@@ -94,18 +94,26 @@ class CategoryController @Inject() (val controllerComponents: ControllerComponen
         (data: ToDoCategoryFormData) => {
           for {
             oToDoCategory <- onMySQL.ToDoCategoryRepository.get(id.asInstanceOf[ToDoCategory.Id])
-            result        <- onMySQL.ToDoCategoryRepository.update(
-                               oToDoCategory match {
-                                 case Some(toDoCategory) =>
-                                   toDoCategory.map(
-                                     _.copy(
-                                       name  = data.name,
-                                       slug  = data.slug,
-                                       color = data.color
-                                     )
-                                   )
-                               }
-                             )
+            result        <- {
+              oToDoCategory match {
+                case Some(toDoCategory) =>
+                  onMySQL.ToDoCategoryRepository.update(
+                    toDoCategory.map(
+                      _.copy(
+                        name  = data.name,
+                        slug  = data.slug,
+                        color = data.color
+                      )
+                    )
+                  )
+                case None               =>
+                  for {
+                    _ <- onMySQL.ToDoCategoryRepository.all()
+                  } yield {
+                    BadRequest(views.html.category.Edit(id, ViewValueToDoCategory.form))
+                  }
+              }
+            }
           } yield {
             result match {
               case Some(_) => Redirect(routes.CategoryController.list())
