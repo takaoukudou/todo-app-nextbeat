@@ -1,6 +1,8 @@
 package model
 
+import lib.model.ToDoCategory
+
 case class ViewValueToDoCategory(
-    id:   Option[Long],
+    id:   ToDoCategory.Id,
     name: String
 )

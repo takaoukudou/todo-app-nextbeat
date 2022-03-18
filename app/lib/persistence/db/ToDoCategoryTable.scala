@@ -8,15 +8,15 @@ import java.time.LocalDateTime
 
 // ToDoTable: ToDoテーブルへのマッピングを行う
 //~~~~~~~~~~~~~~
-case class ToDoCategoryTable[P <: JdbcProfile]()(implicit val driver: P)
-    extends Table[ToDoCategory, P] {
+case class ToDoCategoryTable[P <: JdbcProfile]()(implicit val driver: P) extends Table[ToDoCategory, P] {
+
   import api._
 
   // Definition of DataSourceName
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   lazy val dsn = Map(
     "master" -> DataSourceName("ixias.db.mysql://master/to_do"),
-    "slave" -> DataSourceName("ixias.db.mysql://slave/to_do")
+    "slave"  -> DataSourceName("ixias.db.mysql://slave/to_do")
   )
 
   // Definition of Query
@@ -27,15 +27,16 @@ case class ToDoCategoryTable[P <: JdbcProfile]()(implicit val driver: P)
   // Definition of Table
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   class Table(tag: Tag) extends BasicTable(tag, "to_do_category") {
+
     import ToDoCategory._
+
     // Columns
-    val id = column[Id]("id", O.AutoInc, O.PrimaryKey)
-    val name: Rep[String] =
-      column[String]("name", O.Length(255, varying = true))
-    val slug: Rep[String] = column[String]("slug", O.Length(64, varying = true))
-    val color: Rep[Short] = column[Short]("color")
+    val id                            = column[Id]("id", O.AutoInc, O.PrimaryKey)
+    val name: Rep[String]             = column[String]("name", O.Length(255, varying = true))
+    val slug: Rep[String]             = column[String]("slug", O.Length(64, varying = true))
+    val color: Rep[Short]             = column[Short]("color")
     val updatedAt: Rep[LocalDateTime] = column[LocalDateTime]("updated_at")
-    val createdAt = column[LocalDateTime]("created_at")
+    val createdAt                     = column[LocalDateTime]("created_at")
 
     type TableElementTuple = (
         Option[Id],
